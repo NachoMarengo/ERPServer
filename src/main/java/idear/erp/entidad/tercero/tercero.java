@@ -1,7 +1,7 @@
 package idear.erp.entidad.tercero;
 
-import idear.erp.entidad.entidad;
+import idear.erp.entidad.Entidad;
 
-public class tercero  extends entidad{
+public class tercero  extends Entidad{
 
 }

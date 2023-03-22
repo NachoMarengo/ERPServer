@@ -1,6 +1,6 @@
 package idear.erp.entidad.marca;
 
-import idear.erp.entidad.entidad;
+import idear.erp.entidad.Entidad;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,11 +10,11 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "marca")
-public class Marca extends entidad{
+public class Marca extends Entidad{
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int id;
+	private Long id;
 	@Column(nullable = false)
 	private String nombre;
 	@Column(nullable = false)
@@ -22,7 +22,7 @@ public class Marca extends entidad{
 	@Column
 	private String descripcion;
 	
-	public Marca(int id, String nombre, String fechaCreacion, String descripcion) {
+	public Marca(Long id, String nombre, String fechaCreacion, String descripcion) {
 		super();
 		this.id = id;
 		this.nombre = nombre;
@@ -34,11 +34,11 @@ public class Marca extends entidad{
 		super();
 	}
 
-	public int getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 

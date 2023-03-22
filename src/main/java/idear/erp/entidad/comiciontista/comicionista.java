@@ -1,7 +1,7 @@
 package idear.erp.entidad.comiciontista;
 
-import idear.erp.entidad.entidad;
+import idear.erp.entidad.Entidad;
 
-public class comicionista extends entidad {
+public class comicionista extends Entidad {
 
 }

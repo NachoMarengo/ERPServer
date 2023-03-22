@@ -1,109 +1,77 @@
 package idear.erp.articulo;
 
 import java.util.List;
-import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.springframework.stereotype.Repository;
 
-public class gestorArticulo {
+import jakarta.transaction.Transactional;
+
+@Repository
+@Transactional
+public class GestorArticulo {
 	
-    private static final Logger _traza = Logger.getLogger(gestorArticulo.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(GestorArticulo.class.getName());
+    private static final String QUERY_LEER_TODOS = "from Articulo";
+    private static final String QUERY_LEER_POR_ID = "from Articulo where id = :id";
 	
-	SessionFactory miFactory = new Configuration().configure("hibernate.cfg.xml")
-			.addAnnotatedClass(Articulo.class).buildSessionFactory();
-	Session miSession = miFactory.openSession();
-	
+    private final SessionFactory sessionFactory;
+    private final Session session;
+    
+    public GestorArticulo() {
+        sessionFactory = new Configuration().configure("hibernate.cfg.xml").addAnnotatedClass(Articulo.class).buildSessionFactory();
+        session = sessionFactory.openSession();
+    }
+
 	public void guardarArticulo(Articulo miArticulo) {
-		
-		try {
-			
-			miSession.beginTransaction();
-			miSession.save(miArticulo);
-			miSession.getTransaction().commit();
-			miSession.close();
-			
-			_traza.log(Level.INFO, "Articulo correctamente ingresado");
-		
-		}catch (Exception e) {
-			// TODO: handle exception
-		}finally {
-			
-		}
+		session.save(miArticulo);
+        LOGGER.log(Level.INFO, "Articulo correctamente ingresado");
+        session.close();
 	}
 	
 	public void actualizarArticulo(Articulo miArticulo) {
-	    try {
-	        miSession.beginTransaction();
-	        miSession.update(miArticulo);
-	        miSession.getTransaction().commit();
-	        miSession.close();
-
-	        _traza.log(Level.INFO, "Articulo correctamente actualizado");
-	    } catch (Exception e) {
-	        _traza.log(Level.INFO, e.toString());
-	    } finally {
-	        // Cerrar la sesión de Hibernate
-	    }
+        session.update(miArticulo);
+        LOGGER.log(Level.INFO, "Articulo correctamente actualizado");
+        session.close();
 	}
 	
 	public List<Articulo> leerArticulo() {
-		try {
-			miSession.beginTransaction();
-			List<Articulo> articulos = miSession.createQuery("from Articulo")
-							.setMaxResults(100)
-							.getResultList();
-			for(Articulo articulo: articulos) {
-				_traza.log(Level.INFO, articulo.toString());
-			}
-			miSession.close();
-			return articulos;
-		} catch (Exception e) {
-			_traza.log(Level.INFO, e.toString());
-		} finally {
+		List<Articulo> articulos = session.createQuery(QUERY_LEER_TODOS).setMaxResults(100).getResultList();
+		for(Articulo articulo: articulos) {
+			LOGGER.log(Level.INFO, articulo.toString());
 		}
-		return null;
+		session.close();
+		return articulos;
 	}
-
 	
 	public Articulo leerArticulo(int id) {
-		try {
-			miSession.beginTransaction();
-			Articulo articulo = (Articulo) miSession.createQuery("from Articulo where id = :id")
-							.setParameter("id", id)
-							.uniqueResult();
-			_traza.log(Level.INFO, articulo.toString());
-			miSession.close();
-			return articulo;
-		} catch (Exception e) {
-			_traza.log(Level.INFO, e.toString());
-		} finally {
-		}
-		return null;
+		Articulo articulo = (Articulo) session.createQuery(QUERY_LEER_POR_ID).setParameter("id", id).uniqueResult();
+		LOGGER.log(Level.INFO, articulo.toString());
+		session.close();
+		return articulo;
 	}
 	
 	public void bajaArticulo(int id) {
-		try {
-			miSession.beginTransaction();
-			Articulo articulo = (Articulo) miSession.createQuery("from Articulo where id = :id")
-							.setParameter("id", id)
-							.uniqueResult();
-			if (articulo != null) {
-				miSession.delete(articulo);
-				_traza.log(Level.INFO, "Articulo con id " + id + " dado de baja correctamente");
-			} else {
-				_traza.log(Level.INFO, "No se encontró ningún artículo con el id " + id);
-			}
-			miSession.getTransaction().commit();
-		} catch (Exception e) {
-			miSession.getTransaction().rollback();
-			_traza.log(Level.INFO, "Error al dar de baja el artículo con id " + id + ": " + e.getMessage());
-		} finally {
-			miSession.close();
-		}
+	    Articulo articulo = leerArticulo(id);
+	    if (articulo != null) {
+	        try {
+	            session.beginTransaction();
+	            session.delete(articulo);
+	            session.getTransaction().commit();
+	            LOGGER.log(Level.INFO, "Articulo con id " + id + " dado de baja correctamente");
+	        } catch (Exception e) {
+	            session.getTransaction().rollback();
+	            LOGGER.log(Level.INFO, "Error al dar de baja el artículo con id " + id + ": " + e.getMessage());
+	        } finally {
+	            session.close();
+	        }
+	    } else {
+	        LOGGER.log(Level.INFO, "No se encontró ningún artículo con el id " + id);
+	    }
 	}
 	
 }

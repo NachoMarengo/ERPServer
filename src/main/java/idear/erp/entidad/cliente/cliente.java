@@ -1,7 +1,7 @@
 package idear.erp.entidad.cliente;
 
-import idear.erp.entidad.entidad;
+import idear.erp.entidad.Entidad;
 
-public class cliente extends entidad{
+public class cliente extends Entidad{
 
 }
